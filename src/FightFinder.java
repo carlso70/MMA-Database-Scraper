@@ -10,32 +10,26 @@ import java.io.*;
 // This class scrapes through for fighter info
 
 public class FightFinder {
-	private String weightClassURL;
+	//CLASS is the weight class, PAGE is the url page number which is formatted as 0 20 40. Each page number is +20
+	private final String weightClassURL = "http://www.ufc.com/fighter/Weight_Class/W_CLASS?offset=PAGE&max=20&sort=lastName&order=asc";
+	private String fallbackWeightClassURL = "http://www.ufc.com/fighter/Weight_Class?offset=0&max=20&sort=lastName&order=asc";
 	private List<Fighter> fighters;
 
 	public FightFinder() {
-		this.weightClassURL = "http://www.ufc.com/fighter/Weight_Class/";
 		fighters = new ArrayList<Fighter>();
 	}
 
-	public void getWeightClass(String weightClass) {
+	public void getWeightClass(String weightClass, int page) {
 		/*
 		 * Check if parameter weightClass is a weightClass, if not then look up
 		 * all fighters
 		 */
 		String url;
 		if (Arrays.asList(Constants.WEIGHT_CLASSES).contains(weightClass))
-			url = this.weightClassURL + weightClass;
+			url = this.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE", Integer.toString(page));
 		else
-			url = this.weightClassURL;
+			url = "http://www.ufc.com/fighter/Weight_Class/";
 
-		String name = "test";
-		String nickname = "test";
-		int wins = -1;
-		int losses = -1;
-		int draws = -1;
-		int weight = -1;
-		int height = -1;
 		try {
 			Document doc = Jsoup.connect(url).get();
 			String title = doc.title();
@@ -46,6 +40,14 @@ public class FightFinder {
 			Elements infoCells = doc.select("div.content-inner > div.fighter-listing-page > "
 					+ "div.content-section > div > div.main-section > div.tab-content > "
 					+ "table > tbody > tr.fighter > td > div.cell-inner");
+			
+			String name = "test";
+			String nickname = "test";
+			int wins = -1;
+			int losses = -1;
+			int draws = -1;
+			int weight = -1;
+			int height = -1;
 
 			int cellCounter = 0;
 			for (Element cell : infoCells) {
@@ -88,9 +90,9 @@ public class FightFinder {
 			}
 
 			for (Fighter f : fighters) {
-				System.out.println(f.getName() + " has this many wins " + f.getWins());
-
+				System.out.println(f.getName() + " " + f.getWins());
 			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
