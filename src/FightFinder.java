@@ -40,6 +40,26 @@ public class FightFinder {
 		}
 	}
 
+	public void getAllFighters() {
+		int page = 0;
+		int classNumber = 0;
+		String url;
+		
+		while (classNumber < Constants.WEIGHT_CLASSES.length) {
+			url = this.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
+					.replaceAll("PAGE", Integer.toString(page));
+			// Loop through weight class
+			while (parseWeightClassPage(url)) {
+				page += 20;
+				url = this.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
+						.replaceAll("PAGE", Integer.toString(page));
+			}
+			// Move to next weight class
+			page = 0;
+			classNumber++;
+		}
+	}
+
 	public Boolean parseWeightClassPage(String url) {
 		try {
 			Document doc = Jsoup.connect(url).get();
@@ -52,10 +72,9 @@ public class FightFinder {
 					+ "div.content-section > div > div.main-section > div.tab-content > "
 					+ "table > tbody > tr.fighter > td > div.cell-inner");
 
-			
 			if (infoCells.text().toString().length() <= 0)
 				return false;
-			
+
 			String name = "test";
 			String nickname = "test";
 			int wins = -1;
