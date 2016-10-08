@@ -10,9 +10,10 @@ import java.io.*;
 // This class scrapes through for fighter info
 
 public class FightFinder {
-	//CLASS is the weight class, PAGE is the url page number which is formatted as 0 20 40. Each page number is +20
+	// CLASS is the weight class, PAGE is the url page number which is formatted
+	// as 0 20 40. Each page number is +20
 	private final String weightClassURL = "http://www.ufc.com/fighter/Weight_Class/W_CLASS?offset=PAGE&max=20&sort=lastName&order=asc";
-	private String fallbackWeightClassURL = "http://www.ufc.com/fighter/Weight_Class?offset=0&max=20&sort=lastName&order=asc";
+	private final String fallbackWeightClassURL = "http://www.ufc.com/fighter/Weight_Class?offset=PAGE&max=20&sort=lastName&order=asc";
 	private List<Fighter> fighters;
 
 	public FightFinder() {
@@ -28,8 +29,18 @@ public class FightFinder {
 		if (Arrays.asList(Constants.WEIGHT_CLASSES).contains(weightClass))
 			url = this.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE", Integer.toString(page));
 		else
-			url = "http://www.ufc.com/fighter/Weight_Class/";
+			url = this.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
 
+		while (parseWeightClassPage(url)) {
+			page += 20;
+			if (Arrays.asList(Constants.WEIGHT_CLASSES).contains(weightClass))
+				url = this.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE", Integer.toString(page));
+			else
+				url = this.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
+		}
+	}
+
+	public Boolean parseWeightClassPage(String url) {
 		try {
 			Document doc = Jsoup.connect(url).get();
 			String title = doc.title();
@@ -40,6 +51,10 @@ public class FightFinder {
 			Elements infoCells = doc.select("div.content-inner > div.fighter-listing-page > "
 					+ "div.content-section > div > div.main-section > div.tab-content > "
 					+ "table > tbody > tr.fighter > td > div.cell-inner");
+
+			
+			if (infoCells.text().toString().length() <= 0)
+				return false;
 			
 			String name = "test";
 			String nickname = "test";
@@ -89,12 +104,14 @@ public class FightFinder {
 				}
 			}
 
-			for (Fighter f : fighters) {
-				System.out.println(f.getName() + " " + f.getWins());
-			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
+	}
+
+	public List<Fighter> getFighters() {
+		return this.fighters;
 	}
 }
