@@ -5,6 +5,8 @@ public class Fighter {
 	private int weight;
 	private int height;
 	private int wins, losses, draws;
+	private int ranking;
+	private int pfpRanking; //Pound for pound ranking on the ufc website
 
 	// Height is in cm, weight is in lbs
 	public Fighter(String name, String nickname, int height, int weight, int wins, int losses, int draws) {
@@ -20,6 +22,8 @@ public class Fighter {
 	public Fighter() {}
 	
 	// Setters
+	public void setRanking(int ranking) { this.ranking = ranking; }
+	public void setPFPRanking(int rank) { this.pfpRanking = pfpRanking; }
 	public void setName(String name) { this.name = name; }
 	public void setNickname(String nickname) { this.nickname = nickname; }
 	public void setWeight(int weight) { this.weight = weight; }

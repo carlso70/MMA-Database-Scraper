@@ -13,4 +13,8 @@ public class Constants {
 			"Women_Strawweight",
 			"Women_Bantamweight"
 	};
+	
+	public static final String weightClassURL = "http://www.ufc.com/fighter/Weight_Class/W_CLASS?offset=PAGE&max=20&sort=lastName&order=asc";
+	public static final String fallbackWeightClassURL = "http://www.ufc.com/fighter/Weight_Class?offset=PAGE&max=20&sort=lastName&order=asc";
+	public static final String rankingsURL = "http://www.ufc.com/rankings";
 }

@@ -12,8 +12,6 @@ import java.io.*;
 public class FightFinder {
 	// CLASS is the weight class, PAGE is the url page number which is formatted
 	// as 0 20 40. Each page number is +20
-	private final String weightClassURL = "http://www.ufc.com/fighter/Weight_Class/W_CLASS?offset=PAGE&max=20&sort=lastName&order=asc";
-	private final String fallbackWeightClassURL = "http://www.ufc.com/fighter/Weight_Class?offset=PAGE&max=20&sort=lastName&order=asc";
 	private List<Fighter> fighters;
 
 	public FightFinder() {
@@ -27,31 +25,33 @@ public class FightFinder {
 		 */
 		String url;
 		if (Arrays.asList(Constants.WEIGHT_CLASSES).contains(weightClass))
-			url = this.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE", Integer.toString(page));
+			url = Constants.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE",
+					Integer.toString(page));
 		else
-			url = this.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
+			url = Constants.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
 
 		while (parseWeightClassPage(url)) {
 			page += 20;
 			if (Arrays.asList(Constants.WEIGHT_CLASSES).contains(weightClass))
-				url = this.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE", Integer.toString(page));
+				url = Constants.weightClassURL.replaceAll("W_CLASS", weightClass).replaceAll("PAGE",
+						Integer.toString(page));
 			else
-				url = this.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
+				url = Constants.fallbackWeightClassURL.replaceAll("PAGE", Integer.toString(page));
 		}
 	}
 
-	public void getAllFighters() {
+	public void parseAllFighters() {
 		int page = 0;
 		int classNumber = 0;
 		String url;
-		
+
 		while (classNumber < Constants.WEIGHT_CLASSES.length) {
-			url = this.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
+			url = Constants.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
 					.replaceAll("PAGE", Integer.toString(page));
 			// Loop through weight class
 			while (parseWeightClassPage(url)) {
 				page += 20;
-				url = this.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
+				url = Constants.weightClassURL.replaceAll("W_CLASS", Constants.WEIGHT_CLASSES[classNumber])
 						.replaceAll("PAGE", Integer.toString(page));
 			}
 			// Move to next weight class
@@ -72,6 +72,7 @@ public class FightFinder {
 					+ "div.content-section > div > div.main-section > div.tab-content > "
 					+ "table > tbody > tr.fighter > td > div.cell-inner");
 
+			// If there are no fighters on the page
 			if (infoCells.text().toString().length() <= 0)
 				return false;
 
@@ -123,14 +124,43 @@ public class FightFinder {
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 		return true;
 	}
 
+	public void parseFighterRankings() {
+		try {
+			Document doc = Jsoup.connect(Constants.rankingsURL).get();
+			String title = doc.title();
+			System.out.println(title);
+
+			Elements rankingCells = doc.select("div.content-inner > div#fighter-rankings > div.content-section > "
+					+ "div.content-section-inner > div.main-section > div#ranking-lists");
+
+			for (Element cell : rankingCells) {
+
+				boolean pfp = false;
+				if (cell.select("div.ranking-list > div.weight-class-name").text().toString().contains("Pound")) {
+					pfp = true;
+				}
+
+				for (Element rank : cell.select("div.rankings-table")) {
+					if (pfp) {
+						System.out.println(rank);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public List<Fighter> getFighters() {
 		return this.fighters;
 	}
+
 }
