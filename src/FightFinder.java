@@ -140,16 +140,24 @@ public class FightFinder {
 			Elements rankingCells = doc.select("div.content-inner > div#fighter-rankings > div.content-section > "
 					+ "div.content-section-inner > div.main-section > div#ranking-lists");
 
+			
+			//TODO add ranking for champions 
 			for (Element cell : rankingCells) {
-
 				boolean pfp = false;
 				if (cell.select("div.ranking-list > div.weight-class-name").text().toString().contains("Pound")) {
 					pfp = true;
 				}
 
-				for (Element rank : cell.select("div.rankings-table")) {
+				int i = 1;
+				for (Element rank : cell.select("div.rankings-table > table > tbody > tr > td.name-column > a")) {
+					
+					System.out.println(rank.text() + " " + i++);
 					if (pfp) {
-						System.out.println(rank);
+						//System.out.println(rank);
+						pfp = false;
+					}
+					if (i == 16) {
+						i = 1;
 					}
 				}
 			}
