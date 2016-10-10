@@ -5,8 +5,8 @@ public class Fighter {
 	private int weight;
 	private int height;
 	private int wins, losses, draws;
-	private int ranking;
-	private int pfpRanking; //Pound for pound ranking on the ufc website
+	private int ranking; // Set to 0 if champion
+	private int pfpRanking; //UFC's pound for pound ranking
 
 	// Height is in cm, weight is in lbs
 	public Fighter(String name, String nickname, int height, int weight, int wins, int losses, int draws) {
